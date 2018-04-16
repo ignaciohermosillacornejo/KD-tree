@@ -1,5 +1,5 @@
 #pragma once
-
+int times_called;
 
 /** Representa un punto en 2D */
 struct point

@@ -18,3 +18,5 @@ struct list
 List* list_prepend(List* list, int row, int col);
 /** Libera todos los recursos asociados a la lista */
 void  list_destroy(List* list);
+
+void list_print(List *list);

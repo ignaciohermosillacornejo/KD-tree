@@ -13,6 +13,18 @@ List* list_prepend(List* list, int row, int col)
 	return node;
 }
 
+void list_print(List* list)
+{
+	while(list)
+	{
+		List * prev = list;
+		list = list -> next;
+		printf("(%d, %d) ", prev -> row, prev -> col);
+	}
+	printf("\n");
+}
+
+
 /** Libera todos los recursos asociados a la lista */
 void  list_destroy(List* list)
 {
