@@ -24,4 +24,5 @@ struct kdtree
 
 Kdtree *kdtree_init(int width, int height, int nuclei_count);
 void kdtree_destroy(Kdtree *kdtree);
-void kdtree_insert(Kdtree *tree, char axis, Point pivot, int lvalue, int rvalue, int middle);
+void kdtree_insert(Kdtree *tree, int axis, Point pivot, int lvalue, int rvalue, int middle);
+int kdtree_nns(int row, int col, Kdtree *tree, Point *v);

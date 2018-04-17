@@ -60,11 +60,14 @@ void qselect(Point *a, Point *v, int len, int k, int axis)
 		qselect(a, v, st, k, axis);
 }
 
+
 void split_space(Point *v, Kdtree *kdtree, int lvalue, int rvalue, int axis, int kdbox_size)
 {
+	/* iterative method to split the space creating boxes, general idea is the following:
+	* Step: 1
+	*/
 	int len = (1 + rvalue - lvalue); /* len is the number of items 1,2,....,N */
 	int pivot = lvalue + (len / 2); /* pivot is the position of the mediam */
-	// printf("lvalue: %d, rvalue: %d, pivot: %d, len: %d, axis: %d \n", lvalue, rvalue, pivot, len, axis);
 	/* order the array and put the pivot on the correct position */
 	qselect(v, v + lvalue, len, pivot - lvalue, axis);
 	/* we create the two boxes that split the space based on our pivot
@@ -113,7 +116,7 @@ int main(int argc, char **argv)
 	/* Lee el archivo de la imagen */
 	Image *img = img_png_read_from_file(argv[1]);
 	/* Abre la ventana de las dimensiones especificadas */
-	// watcher_open(img -> height, img -> width);
+	watcher_open(img -> height, img -> width);
 
 	// Pinta la imagen en la ventana. Para cada pixel:
 	/*
@@ -159,25 +162,27 @@ int main(int argc, char **argv)
 	List **cells = calloc(nuclei_count, sizeof(List *));
 
 	times_called = 0;
-	printf("%d %d", img->height, img->width);
 	Kdtree *kdtree = kdtree_init(img->width, img->height, nuclei_count);
-
-	for (int i = 0; i < nuclei_count; i++)
-	{
-		printf("(%f, %f)\n", nuclei[i].X, nuclei[i].Y);
-	}
-
 	split_space(nuclei, kdtree, 0, nuclei_count - 1, 0, 2);
 
-	printf("\n");
-	printf("%d\n", nuclei_count / 2);
-	for (int i = 0; i < nuclei_count; i++)
-	{
-		printf("(%f, %f)\n", nuclei[i].X, nuclei[i].Y);
-	}
-
-	return 0;
 	// Para cada píxel de la imagen
+	
+	for (int row = 0; row < img->height; row++)
+	{
+		for (int col = 0; col < img->width; col++)
+		{
+			// Identifica cual es el núcleo más cercano al pixel
+			int closest_point = kdtree_nns(row, col, kdtree, nuclei);
+			
+			// Se asocia el píxel a su núcleo más cercano
+			cells[closest_point] = list_prepend(cells[closest_point], row, col);
+		}
+	}
+	
+	kdtree_destroy(kdtree);
+	
+	// Para cada píxel de la imagen
+	/*
 	for (int row = 0; row < img->height; row++)
 	{
 		for (int col = 0; col < img->width; col++)
@@ -201,6 +206,7 @@ int main(int argc, char **argv)
 			cells[closest_point] = list_prepend(cells[closest_point], row, col);
 		}
 	}
+	*/
 
 	/**************************************************************************/
 	/*                                  PASO 3                                */
@@ -247,7 +253,7 @@ int main(int argc, char **argv)
 	watcher_snapshot("mira_mama_que_lindo_mi_programa.png");
 
 	/* Detiene el programa por 5 segundos para que contemples el resultado */
-	sleep(5);
+	// sleep(2);
 
 	/**************************************************************************/
 	/*                          Liberación de Memoria                         */
