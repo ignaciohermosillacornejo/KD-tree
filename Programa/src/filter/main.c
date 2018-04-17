@@ -28,10 +28,8 @@ void qselect(Point *a, Point *v, int len, int k, int axis)
 	int i, st;
 	Point tmp;
 
-	// printf("v[0] %f, len: %d, k: %d, axis: %d\n", v[0].X, len, k, axis);
-
 	/* we select the middle element as our pivot, this increases perfomance as we expect the 
-	 * array to become more ordered as we progress
+	 * array to become more ordered as we progress, as discussed in github issue
 	 */
 
 	SWAP(len - 1, (len - 1) / 2);
@@ -53,13 +51,7 @@ void qselect(Point *a, Point *v, int len, int k, int axis)
 	}
 
 	SWAP(len - 1, st);
-/*
-	for (int j = 0; j < 9; j++)
-	{
-		printf("(%f, %f) ", a[j].X, a[j].Y);
-	}
-	printf("\n");
-*/
+
 	if (len <= 2)
 		return;
 	if (k > st)
@@ -70,15 +62,15 @@ void qselect(Point *a, Point *v, int len, int k, int axis)
 
 void split_space(Point *v, Kdtree *kdtree, int lvalue, int rvalue, int axis, int kdbox_size)
 {
-	int len = (1 + rvalue - lvalue); // len is the number of items 1,2,....,N
-	int pivot = lvalue + (len / 2);
-	printf("lvalue: %d, rvalue: %d, pivot: %d, len: %d, axis: %d \n", lvalue, rvalue, pivot, len, axis);
+	int len = (1 + rvalue - lvalue); /* len is the number of items 1,2,....,N */
+	int pivot = lvalue + (len / 2); /* pivot is the position of the mediam */
+	// printf("lvalue: %d, rvalue: %d, pivot: %d, len: %d, axis: %d \n", lvalue, rvalue, pivot, len, axis);
 	/* order the array and put the pivot on the correct position */
 	qselect(v, v + lvalue, len, pivot - lvalue, axis);
 	/* we create the two boxes that split the space based on our pivot
 	 * lbox will contain [lvalue, pivot - 1] and rbox will contain [pivot, rvalue]
 	 */
-	kdtree_insert(kdtree, axis, v[pivot], lvalue, rvalue);
+	kdtree_insert(kdtree, axis, v[pivot], lvalue, rvalue, pivot);
 	/* if we have more Points left that what we want to put in each box
 	 * we split the space in two again 
 	 */
@@ -87,7 +79,6 @@ void split_space(Point *v, Kdtree *kdtree, int lvalue, int rvalue, int axis, int
 		split_space(v, kdtree, lvalue, pivot - 1, axis ^ 1, kdbox_size);
 		split_space(v, kdtree, pivot, rvalue, axis ^ 1, kdbox_size);
 	}
-	return;
 }
 
 int main(int argc, char **argv)
@@ -168,7 +159,7 @@ int main(int argc, char **argv)
 	List **cells = calloc(nuclei_count, sizeof(List *));
 
 	times_called = 0;
-
+	printf("%d %d", img->height, img->width);
 	Kdtree *kdtree = kdtree_init(img->width, img->height, nuclei_count);
 
 	for (int i = 0; i < nuclei_count; i++)

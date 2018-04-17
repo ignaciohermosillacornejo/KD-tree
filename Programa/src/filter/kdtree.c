@@ -18,28 +18,41 @@ Kdnode *kdnode_init(int axis, Point pivot, Kdnode *parent, int lr_child, int lva
     kdnode->rvalue = rvalue;
     /* if lr_child is 0, it means it is the left  child of the parent 
      * if lr_child is 1, it means it is the right child of the parent 
-     * idem for cases with the Y axis 
+     * reverse for cases with the Y axis 
     */
     if (lr_child == 0 && axis == 0)
         kdnode->b->X = pivot.X;
     else if (lr_child == 1 && axis == 0)
         kdnode->a->X = pivot.X;
     else if (lr_child == 0 && axis == 1)
-        kdnode->a->Y = pivot.Y;
-    else if (lr_child == 1 && axis == 1)
         kdnode->b->Y = pivot.Y;
+    else if (lr_child == 1 && axis == 1)
+        kdnode->a->Y = pivot.Y;
 }
 
-void kdtree_insert(Kdtree *tree, char axis, Point pivot, int lvalue, int rvalue)
+void kdtree_insert(Kdtree *tree, int axis, Point pivot, int lvalue, int rvalue, int middle)
 {
     /* For each insert, we create two kdnodes, one for each new box */
     // TODO: insert children
     Kdnode *current;
     current = tree->head;
-    printf("axis: %c", axis);
-    printf("(%f, %f)\n", pivot.X, pivot.Y);
-    //current->lkdnode = kdnode_init(axis, pivot, current, 0, lvalue, ((rvalue - lvalue) / 2) - 1);
-    //current->rkdnode = kdnode_init(axis, pivot, current, 1, ((rvalue - lvalue) / 2), rvalue - 1);
+    while(current -> lkdnode != NULL)
+    {
+        if (current -> axis == 0)
+        {
+            
+        }
+        else if (current -> axis == 1)
+        {
+
+        }
+
+    }
+    //printf("(%f, %f)\n", pivot.X, pivot.Y);
+    current->lkdnode = kdnode_init(axis, pivot, current, 0, lvalue, middle - 1);
+    //printf("l: %d, r: %d\n", lvalue, middle - 1);
+    current->rkdnode = kdnode_init(axis, pivot, current, 1, middle, rvalue);
+    //printf("l: %d, r: %d\n", middle, rvalue);
 }
 
 Kdtree *kdtree_init(int width, int height, int nuclei_count)
@@ -57,6 +70,7 @@ Kdtree *kdtree_init(int width, int height, int nuclei_count)
     kdtree->head->rkdnode = NULL;
     kdtree->head->rvalue = 0;
     kdtree->head->rvalue = nuclei_count - 1;
+    kdtree->head->axis = 1; // TODO revise this
     return kdtree;
 }
 
