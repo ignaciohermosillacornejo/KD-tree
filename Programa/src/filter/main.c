@@ -9,11 +9,12 @@
 #include "kdtree.h"
 #include <math.h>
 
-void qselect(Point *v, int len, int k)
+void qselect(Point *a, Point *v, int len, int k, int axis)
 {
 /* qselect implementation copied from https://rosettacode.org/wiki/Quickselect_algorithm#C
  * and modified heavily with some optimizations for use with the kdtree
  */
+
 #define SWAP(a, b)       \
 	{                    \
 		if (a != b)      \
@@ -23,37 +24,70 @@ void qselect(Point *v, int len, int k)
 			v[b] = tmp;  \
 		}                \
 	}
+
 	int i, st;
 	Point tmp;
+
+	// printf("v[0] %f, len: %d, k: %d, axis: %d\n", v[0].X, len, k, axis);
 
 	/* we select the middle element as our pivot, this increases perfomance as we expect the 
 	 * array to become more ordered as we progress
 	 */
+
 	SWAP(len - 1, (len - 1) / 2);
 
 	for (st = i = 0; i < len - 1; i++)
 	{
-		if (v[i].X > v[len - 1].X)
-			continue;
+		if (axis == 0)
+		{
+			if (v[i].X > v[len - 1].X)
+				continue;
+		}
+		else if (axis == 1)
+		{
+			if (v[i].Y > v[len - 1].Y)
+				continue;
+		}
 		SWAP(i, st);
 		st++;
 	}
 
 	SWAP(len - 1, st);
-
+/*
+	for (int j = 0; j < 9; j++)
+	{
+		printf("(%f, %f) ", a[j].X, a[j].Y);
+	}
+	printf("\n");
+*/
+	if (len <= 2)
+		return;
 	if (k > st)
-	{
-		qselect(v + (st * sizeof(Point)), len - st, k - st);
-	}
+		qselect(a, v + st, len - st, k - st, axis);
 	else if (k < st)
+		qselect(a, v, st, k, axis);
+}
+
+void split_space(Point *v, Kdtree *kdtree, int lvalue, int rvalue, int axis, int kdbox_size)
+{
+	int len = (1 + rvalue - lvalue); // len is the number of items 1,2,....,N
+	int pivot = lvalue + (len / 2);
+	printf("lvalue: %d, rvalue: %d, pivot: %d, len: %d, axis: %d \n", lvalue, rvalue, pivot, len, axis);
+	/* order the array and put the pivot on the correct position */
+	qselect(v, v + lvalue, len, pivot - lvalue, axis);
+	/* we create the two boxes that split the space based on our pivot
+	 * lbox will contain [lvalue, pivot - 1] and rbox will contain [pivot, rvalue]
+	 */
+	kdtree_insert(kdtree, axis, v[pivot], lvalue, rvalue);
+	/* if we have more Points left that what we want to put in each box
+	 * we split the space in two again 
+	 */
+	if (len / 2 > kdbox_size)
 	{
-		qselect(v, st, k);
+		split_space(v, kdtree, lvalue, pivot - 1, axis ^ 1, kdbox_size);
+		split_space(v, kdtree, pivot, rvalue, axis ^ 1, kdbox_size);
 	}
-	/*
-	return k == st	?v[st]
-			:st > k	? qselect(v, st, k)
-				: qselect(v + st, len - st, k - st);
-	*/
+	return;
 }
 
 int main(int argc, char **argv)
@@ -96,6 +130,7 @@ int main(int argc, char **argv)
 	{
 		for(int col = 0; col < img -> width; col++)
 		{
+			sleep(0.1);
 			// Toma el color del pixel 
 			Color c = img -> pixels[row][col];
 			// Le dice a la ventana que se ponga ese color 
@@ -134,12 +169,15 @@ int main(int argc, char **argv)
 
 	times_called = 0;
 
+	Kdtree *kdtree = kdtree_init(img->width, img->height, nuclei_count);
+
 	for (int i = 0; i < nuclei_count; i++)
 	{
 		printf("(%f, %f)\n", nuclei[i].X, nuclei[i].Y);
 	}
 
-	qselect(nuclei, nuclei_count, nuclei_count / 2);
+	split_space(nuclei, kdtree, 0, nuclei_count - 1, 0, 2);
+
 	printf("\n");
 	printf("%d\n", nuclei_count / 2);
 	for (int i = 0; i < nuclei_count; i++)
