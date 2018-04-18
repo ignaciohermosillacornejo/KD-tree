@@ -162,8 +162,9 @@ int main(int argc, char **argv)
 	List **cells = calloc(nuclei_count, sizeof(List *));
 
 	times_called = 0;
+	int points_per_box = 2;
 	Kdtree *kdtree = kdtree_init(img->width, img->height, nuclei_count);
-	split_space(nuclei, kdtree, 0, nuclei_count - 1, 0, 2);
+	split_space(nuclei, kdtree, 0, nuclei_count - 1, 0, points_per_box);
 
 	// Para cada píxel de la imagen
 	
@@ -251,9 +252,9 @@ int main(int argc, char **argv)
 
 	/* Imprime la ventana en una imagen para se la muestres a tu mamá */
 	watcher_snapshot("mira_mama_que_lindo_mi_programa.png");
-
+	printf("Number of Euclidian Distance: %d\n", times_called);
 	/* Detiene el programa por 5 segundos para que contemples el resultado */
-	// sleep(2);
+	// sleep(4);
 
 	/**************************************************************************/
 	/*                          Liberación de Memoria                         */
