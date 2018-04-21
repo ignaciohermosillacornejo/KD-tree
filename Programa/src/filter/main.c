@@ -8,9 +8,24 @@
 #include "linkedlist.h"
 #include "kdtree.h"
 #include <math.h>
+#include <time.h>
+
+#define MAX(x,y) ((x) >= (y)) ? (x) : (y)
+#define MIN(x,y) ((x) <= (y)) ? (x) : (y)
+
+int middle(a, b, c) 						
+{   										
+	int minVal = MIN(MIN(a, b), c);     			
+	int maxVal = MAX(MAX(a, b), c);			 
+	return a + b + c - maxVal - minVal;	    
+} 
+
 
 void qselect(Point *a, Point *v, int len, int k, int axis)
 {
+
+
+
 /* qselect implementation copied from https://rosettacode.org/wiki/Quickselect_algorithm#C
  * and modified heavily with some optimizations for use with the kdtree
  */
@@ -23,7 +38,7 @@ void qselect(Point *a, Point *v, int len, int k, int axis)
 			v[a] = v[b]; \
 			v[b] = tmp;  \
 		}                \
-	}
+	}                    
 
 	int i, st;
 	Point tmp;
@@ -32,7 +47,7 @@ void qselect(Point *a, Point *v, int len, int k, int axis)
 	 * array to become more ordered as we progress, as discussed in github issue
 	 */
 
-	SWAP(len - 1, (len - 1) / 2);
+	SWAP(len - 1, (len - 1)/2);
 
 	for (st = i = 0; i < len - 1; i++)
 	{
@@ -124,7 +139,7 @@ int main(int argc, char **argv)
 	{
 		for(int col = 0; col < img -> width; col++)
 		{
-			sleep(0.1);
+			sleep(0.01);
 			// Toma el color del pixel 
 			Color c = img -> pixels[row][col];
 			// Le dice a la ventana que se ponga ese color 
@@ -134,6 +149,7 @@ int main(int argc, char **argv)
 		}
 	}
 	*/
+	
 
 	/**************************************************************************/
 	/*                                  PASO 1                                */
@@ -162,9 +178,16 @@ int main(int argc, char **argv)
 	List **cells = calloc(nuclei_count, sizeof(List *));
 
 	times_called = 0;
-	int points_per_box = 2;
-	Kdtree *kdtree = kdtree_init(img->width, img->height, nuclei_count);
+	int points_per_box = 20;
+	Kdtree *kdtree = kdtree_init(img->width, img->height, 2);
+
+	    // Calculate the time taken by fun()
+    clock_t t;
+    t = clock();
 	split_space(nuclei, kdtree, 0, nuclei_count - 1, 0, points_per_box);
+    t = clock() - t;
+    double time_taken = ((double)t)/CLOCKS_PER_SEC; // in seconds
+    printf("fun() took %f seconds to execute \n", time_taken);
 
 	// Para cada píxel de la imagen
 	
@@ -183,6 +206,7 @@ int main(int argc, char **argv)
 	kdtree_destroy(kdtree);
 	
 	// Para cada píxel de la imagen
+	
 	/*
 	for (int row = 0; row < img->height; row++)
 	{
@@ -208,6 +232,7 @@ int main(int argc, char **argv)
 		}
 	}
 	*/
+	
 
 	/**************************************************************************/
 	/*                                  PASO 3                                */
@@ -246,13 +271,15 @@ int main(int argc, char **argv)
 		/* Por cada píxel dentro de la celda correspondiente al i-ésimo núcleo */
 		for (List *curr = cells[i]; curr; curr = curr->next)
 		{
-			watcher_paint_pixel(curr->row, curr->col);
+			// watcher_paint_pixel(curr->row, curr->col);
 		}
+		// sleep(0.3);
 	}
 
 	/* Imprime la ventana en una imagen para se la muestres a tu mamá */
-	watcher_snapshot("mira_mama_que_lindo_mi_programa.png");
+	// watcher_snapshot("mira_mama_que_lindo_mi_programa.png");
 	printf("Number of Euclidian Distance: %d\n", times_called);
+	printf("Pixels: %d\n",img->width * img->height);
 	/* Detiene el programa por 5 segundos para que contemples el resultado */
 	// sleep(4);
 
