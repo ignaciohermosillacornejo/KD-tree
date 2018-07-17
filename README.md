@@ -1,5 +1,5 @@
 # Assignment N1
-Course IIC2133 @ PUC (2010-1) - Data structures and algorithms
+Course IIC2133 @ PUC (2018-1) - Data structures and algorithms
 
 Implementation of an image filter using a voronoi diagram, implemented using a 2 dimensional KD-Tree
 
