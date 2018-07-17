@@ -13,7 +13,7 @@
 #define MAX(x,y) ((x) >= (y)) ? (x) : (y)
 #define MIN(x,y) ((x) <= (y)) ? (x) : (y)
 
-int middle(a, b, c) 						
+int middle(int a, int b, int c) 						
 {   										
 	int minVal = MIN(MIN(a, b), c);     			
 	int maxVal = MAX(MAX(a, b), c);			 
@@ -134,7 +134,6 @@ int main(int argc, char **argv)
 	watcher_open(img -> height, img -> width);
 
 	// Pinta la imagen en la ventana. Para cada pixel:
-	/*
 	for(int row = 0; row < img -> height; row++)
 	{
 		for(int col = 0; col < img -> width; col++)
@@ -148,7 +147,6 @@ int main(int argc, char **argv)
 			watcher_paint_pixel(row, col);
 		}
 	}
-	*/
 	
 
 	/**************************************************************************/
@@ -181,7 +179,7 @@ int main(int argc, char **argv)
 	int points_per_box = 20;
 	Kdtree *kdtree = kdtree_init(img->width, img->height, 2);
 
-	    // Calculate the time taken by fun()
+	// Calculate the time taken by fun()
     clock_t t;
     t = clock();
 	split_space(nuclei, kdtree, 0, nuclei_count - 1, 0, points_per_box);
@@ -271,17 +269,17 @@ int main(int argc, char **argv)
 		/* Por cada píxel dentro de la celda correspondiente al i-ésimo núcleo */
 		for (List *curr = cells[i]; curr; curr = curr->next)
 		{
-			// watcher_paint_pixel(curr->row, curr->col);
+			watcher_paint_pixel(curr->row, curr->col);
 		}
 		// sleep(0.3);
 	}
 
 	/* Imprime la ventana en una imagen para se la muestres a tu mamá */
 	// watcher_snapshot("mira_mama_que_lindo_mi_programa.png");
-	printf("Number of Euclidian Distance: %d\n", times_called);
+	printf("Number of Euclidian Distance: %lld\n", times_called);
 	printf("Pixels: %d\n",img->width * img->height);
 	/* Detiene el programa por 5 segundos para que contemples el resultado */
-	// sleep(4);
+	sleep(4);
 
 	/**************************************************************************/
 	/*                          Liberación de Memoria                         */
